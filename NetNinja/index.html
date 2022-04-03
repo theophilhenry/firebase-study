@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+
+        <h1>Cloud Cafe</h1>
+
+        <div class="content">
+
+            <form id="add-cafe-form">
+                <input type="text" name="name" placeholder="Cafe Name">
+                <input type="text" name="city" placeholder="Cafe City">
+                <button>Add Cafe</button>
+            </form>
+
+            <ul id="cafe-list"></ul>
+
+        </div>
+
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+            import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+            // https://firebase.google.com/docs/web/setup#available-libraries
+
+            const firebaseConfig = {
+              apiKey: "AIzaSyCYB3sEOgDWdBeIfiWQOjdpCGy7xyvAF-Q",
+              authDomain: "ninja-firestore-tut-8085a.firebaseapp.com",
+              projectId: "ninja-firestore-tut-8085a",
+              storageBucket: "ninja-firestore-tut-8085a.appspot.com",
+              messagingSenderId: "47183643748",
+              appId: "1:47183643748:web:5d584e9b4623bcc806cb71",
+              measurementId: "G-KYNQLBNDWT"
+            };
+          
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            const cafeList = document.querySelector('#cafe-list');
+            const form = document.querySelector('#add-cafe-form');
+
+            // Create element and render cafe
+            const renderCafe = (doc) => {
+                let li = document.createElement('li');
+                let name = document.createElement('span');
+                let city = document.createElement('span');
+
+                li.setAttribute('data-id', doc.id) // We don't need to access the data()
+                name.textContent = doc.data().name
+                city.textContent = doc.data().city
+
+                li.appendChild(name)
+                li.appendChild(city)
+                cafeList.append(li)
+            }
+
+            // Getting Data
+            getDocs(collection(db, 'cafes')).then((data)=>{
+                data.docs.forEach((doc) => {
+                    renderCafe(doc);
+                });
+            });
+
+            // Saving Data
+            form.addEventListener('submit', e => {
+                e.preventDefault()
+                addDoc(collection(db, 'cafes'), {
+                    name: form.name.value,
+                    city: form.city.value
+                }).then((data) => {
+                    console.log("Success");
+                })
+                form.name.value = '';
+                form.city.value = '';
+            })
+            
+        </script>
+        <script src="app.js"></script>
+    </body>
+</html>
